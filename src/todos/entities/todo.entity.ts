@@ -16,7 +16,7 @@ export class Todo {
   completed: boolean;
 }
 
-const TodoSchema = SchemaFactory.createForClass(Todo);
+export const TodoSchema = SchemaFactory.createForClass(Todo);
 TodoSchema.virtual('id').get(function (this: Document) {
   return this._id.toHexString();
 });

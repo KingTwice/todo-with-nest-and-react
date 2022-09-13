@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateTodoDto } from './dto/create-todo.dto';
@@ -18,15 +18,29 @@ export class TodosService {
     return await this.todoModel.find().exec();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} todo`;
+  async findOne(id: string) {
+    return await this.todoModel.findById(id).exec();
   }
 
-  update(id: number, updateTodoDto: UpdateTodoDto) {
-    return `This action updates a #${id} todo`;
+  async update(id: string, updateTodoDto: UpdateTodoDto) {
+    const todo = await this.todoModel
+      .findByIdAndUpdate(
+        id,
+        { title: updateTodoDto.title, completed: updateTodoDto.completed },
+        { new: true },
+      )
+      .exec();
+    if (!todo) {
+      throw new NotFoundException();
+    }
+    return todo;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} todo`;
+  async remove(id: string) {
+    const todo = await this.todoModel.findByIdAndRemove(id).exec();
+    if (!todo) {
+      throw new NotFoundException();
+    }
+    return todo;
   }
 }
